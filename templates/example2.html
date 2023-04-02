@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>My Article</title>
+    <title>Message Log</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,6 +26,7 @@
             padding: 20px;
             background-color: #fff;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            word-wrap: break-word;
         }
 
         h1 {
@@ -47,31 +48,20 @@
 </head>
 
 <body>
-
-    <header>My Article</header>
-    <main>
-        <h1>This is my article</h1>
-        <img src="https://placekitten.com/800/400" alt="A cute kitten">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, lorem et dapibus eleifend, velit nunc
-            euismod arcu, id elementum mauris sapien in nisi. Praesent rhoncus, magna at volutpat pretium, nunc mauris
-            pharetra lectus, ac interdum metus libero vel odio. Vestibulum blandit risus eget sem vestibulum ultrices.
-        </p>
-        <p>Pellentesque non ipsum neque. Nullam pharetra vitae nisi eget bibendum. Suspendisse sit amet commodo tortor.
-            Nunc
-            vel fringilla dolor, et lobortis nisl. Nam fermentum diam sed enim vestibulum lobortis. Integer sagittis
-            aliquet
-            eros, sit amet facilisis quam laoreet nec.</p>
-    </main>
-    <script type="text/javascript">
-
+    <header>Message Log</header>
+    <script>
         // Create a Javascript EventSource
         var source = new EventSource("http://127.0.0.1:8080/2");
+        let main = document.getElementsByTagName("main")
+        let otherMain = document.getElementById("main")
+
         let permission = Notification.permission;
 
         // Create a callback for when a new message is received.
         source.onmessage = function (e) {
-
-            var data = String(e.data);
+            var fullData = JSON.parse(e.data);
+            var data = fullData.message
+            // Check permissions
             if (permission === "granted") {
                 showNotification(data);
             } else if (permission === "default") {
@@ -90,16 +80,14 @@
         }
 
         function showNotification(body) {
-            console.log(body)
-            var title = "Push Notification";
-            const notification = new Notification(title, { body });
-            notification.onclick = () => {
-                console.log("Do we get here?")
-                notification.close();
-                window.parent.focus();
-            }
+            console.log("Do we get here?")
+            const textNode = document.createTextNode(body);
+            const p = document.createElement("p");
+            p.appendChild(textNode);
+            main[0].appendChild(p);
         }
     </script>
-</body>
+    <main>
 
-</html>
+    </main>
+</body>

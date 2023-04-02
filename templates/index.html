@@ -2,24 +2,103 @@
 <html>
 
 <head>
-    <title>SSE with timestamps</title>
+    <title>My Article</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f1f1;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-top: 0;
+        }
+
+        p {
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 
 <body>
 
-    Hello {{.}}, this is a series of timestamps:<br>
-
+    <header>My Article</header>
+    <main>
+        <h1>This is my article</h1>
+        <img src="https://placekitten.com/800/400" alt="A cute kitten">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, lorem et dapibus eleifend, velit nunc
+            euismod arcu, id elementum mauris sapien in nisi. Praesent rhoncus, magna at volutpat pretium, nunc mauris
+            pharetra lectus, ac interdum metus libero vel odio. Vestibulum blandit risus eget sem vestibulum ultrices.
+        </p>
+        <p>Pellentesque non ipsum neque. Nullam pharetra vitae nisi eget bibendum. Suspendisse sit amet commodo tortor.
+            Nunc
+            vel fringilla dolor, et lobortis nisl. Nam fermentum diam sed enim vestibulum lobortis. Integer sagittis
+            aliquet
+            eros, sit amet facilisis quam laoreet nec.</p>
+    </main>
     <script type="text/javascript">
 
         // Create a Javascript EventSource
         var source = new EventSource("http://127.0.0.1:8080/2");
+        let permission = Notification.permission;
 
         // Create a callback for when a new message is received.
         source.onmessage = function (e) {
 
-            // Append the data attribute of the message to the DOM.
-            document.body.innerHTML += e.data + '<br>';
+            var data = String(e.data);
+            if (permission === "granted") {
+                showNotification(data);
+            } else if (permission === "default") {
+                requestAndShowPermission(data);
+            } else {
+                alert("Use normal alert");
+            }
         };
+
+        function requestAndShowPermission(data) {
+            Notification.requestPermission().then((result) => {
+                if (result === "granted") {
+                    showNotification(data);
+                }
+            });
+        }
+
+        function showNotification(body) {
+            console.log(body)
+            var title = "Push Notification";
+            const notification = new Notification(title, { body });
+            notification.onclick = () => {
+                console.log("Do we get here?")
+                notification.close();
+                window.parent.focus();
+            }
+        }
     </script>
 </body>
 
